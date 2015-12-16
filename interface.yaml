@@ -1,4 +1,4 @@
-name: datanode
-summary: Interface for relating DataNodes to NameNodes
+name: nodemanager
+summary: Interface for relating NodeManagers to ResourceManagers 
 version: 1
 maintainer: "Big Data Team <bigdata@lists.ubuntu.com>"

@@ -20,9 +20,9 @@ from charms.reactive.bus import get_states
 from charmhelpers.core import hookenv
 
 
-class DataNodeProvides(RelationBase):
+class NodeManagerProvides(RelationBase):
     scope = scopes.GLOBAL
-    auto_accessors = ['host', 'port', 'webhdfs-port', 'ssh-key']
+    auto_accessors = ['host', 'resourcemanager_port', 'hs_http', 'hs_ipc', 'ssh-key']
 
     def set_spec(self, spec):
         """
@@ -42,21 +42,22 @@ class DataNodeProvides(RelationBase):
     def hosts_map(self):
         return json.loads(self.get_remote('hosts-map', '{}'))
 
-    @hook('{requires:datanode}-relation-joined')
+    @hook('{requires:nodemanager}-relation-joined')
     def joined(self):
         self.set_state('{relation_name}.related')
 
-    @hook('{requires:datanode}-relation-changed')
+    @hook('{requires:nodemanager}-relation-changed')
     def changed(self):
         hookenv.log('Data: {}'.format({
             'spec': self.spec(),
             'host': self.host(),
-            'port': self.port(),
-            'webhdfs_port': self.webhdfs_port(),
+            'resourcemanager_port': self.resourcemanager_port(),
+            'hs_http': self.hs_http(),
+            'hs_ipc': self.hs_ipc(),
             'hosts_map': self.hosts_map(),
             'local_hostname': self.local_hostname(),
         }))
-        available = all([self.spec(), self.host(), self.port(), self.webhdfs_port(), self.ssh_key()])
+        available = all([self.spec(), self.host(), self.resourcemanager_port(), self.hs_http(), self.hs_ipc(), self.ssh_key()])
         spec_matches = self._spec_match()
         registered = self.local_hostname() in self.hosts_map().values()
 
@@ -68,7 +69,7 @@ class DataNodeProvides(RelationBase):
     def register(self):
         self.set_remote('registered', 'true')
 
-    @hook('{requires:datanode}-relation-{departed,broken}')
+    @hook('{requires:nodemanager}-relation-{departed,broken}')
     def departed(self):
         self.remove_state('{relation_name}.related')
         self.remove_state('{relation_name}.spec.mismatch')

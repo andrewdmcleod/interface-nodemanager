@@ -19,27 +19,27 @@ from charms.reactive import scopes
 from jujubigdata import utils
 
 
-class DataNodeRequires(RelationBase):
+class NodeManagerRequires(RelationBase):
     scope = scopes.UNIT
 
-    @hook('{provides:datanode}-relation-joined')
+    @hook('{provides:nodemanager}-relation-joined')
     def joined(self):
         conv = self.conversation()
         conv.set_state('{relation_name}.related')
 
-    @hook('{provides:datanode}-relation-changed')
+    @hook('{provides:nodemanager}-relation-changed')
     def changed(self):
         conv = self.conversation()
         registered = conv.get_remote('registered', 'false').lower() == 'true'
         conv.toggle_state('{relation_name}.registered', registered)
 
-    @hook('{provides:datanode}-relation-departed')
+    @hook('{provides:nodemanager}-relation-departed')
     def departed(self):
         conv = self.conversation()
         conv.add_state('{relation_name}.departing')
         conv.remove_state('{relation_name}.related')
 
-    @hook('{provides:datanode}-relation-broken')
+    @hook('{provides:nodemanager}-relation-broken')
     def broken(self):
         conv = self.conversation()
         conv.remove_state('{relation_name}.related')
@@ -62,11 +62,12 @@ class DataNodeRequires(RelationBase):
         for conv in self.conversations():
             conv.set_remote('host', host)
 
-    def send_ports(self, port, webhdfs_port):
+    def send_ports(self, resourcemanager_port, hs_http, hs_ipc):
         for conv in self.conversations():
             conv.set_remote(data={
-                'port': port,
-                'webhdfs-port': webhdfs_port,
+                'resourcemanager_port': resourcemanager_port,
+                'hs_http': hs_http,
+                'hs_ipc': hs_ipc,
             })
 
     def send_ssh_key(self, ssh_key):
