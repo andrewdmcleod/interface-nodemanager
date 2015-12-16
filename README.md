@@ -1,56 +1,57 @@
 # Overview
 
-This interface layer handles the communication between the [NameNode][] and
-[DataNode][] component of the Apache Hadoop cluster charms.
+This interface layer handles the communication between the [ResourceManager][] and
+[NodeManager][] component of the Apache Hadoop cluster charms.
 
 
 # Usage
 
 ## Requires
 
-The NameNode requires this interface, to gain access to one or more DataNode
+The ResourceManager requires this interface, to gain access to one or more NodeManager
 units.
 
 This interface layer will set the following states, as appropriate:
 
-  * `{relation_name}.related` One or more DataNodes have connected.  The
+  * `{relation_name}.related` One or more NodeManagers have connected.  The
     charm should call the following methods to provide the appropriate
-    information to the DataNodes:
+    information to the NodeManagers:
       * `send_spec(spec)`
       * `send_host(host)`
-      * `send_ports(port, webhdfs_port)`
+      * `send_ports(port, resourcemanager_port, hs_http, hs_ipc)`
       * `send_ssh_key(ssh_key)`
       * `send_hosts_map(hosts_map)`
 
-  * `{relation_name}.registered` One or more DataNodes are ready to use.
-    Information about the registered DataNodes can be gotten from the method:
-      * `datanodes()`
+  * `{relation_name}.registered` One or more NodeManagers are ready to use.
+    Information about the registered NodeManagers can be gotten from the method:
+      * `nodemanagers()`
 
-  * `{relation_name}.departing` One or more DataNodes are about to depart,
+  * `{relation_name}.departing` One or more NodeManagers are about to depart,
     and the NameNode should remove them from the pool of slaves.
-    Information about the departing DataNodes can be gotten from the method:
-      * `datanodes()`
+    Information about the departing NodeManagers can be gotten from the method:
+      * `nodemanagers()`
 
 
 ## Provides
 
 This interface layer will set the following states, as appropriate:
 
-  * `{relation_name}.related` The relation is established, but HDFS may not yet
+  * `{relation_name}.related` The relation is established, but YARN may not yet
     have provided any connection or service information.
 
-  * `{relation_name}.ready` The NameNode has provided all of the necessary
+  * `{relation_name}.ready` The ResourceManager has provided all of the necessary
     information, and this unit is present in the hosts map, indicating that
-    it can be seen by the NameNode and all other DataNodes.
+    it can be seen by the ResourceManager and all other NodeManagers.
     The provided information can be accessed via the following methods:
       * `spec()`
       * `host()`
-      * `port()`
-      * `webhdfs_port()`
+      * `resourcemanager_port()`
+      * `hs_http()`
+      * `hs_ipc()`
       * `ssh_key()`
       * `hosts_map()`
 
-    The DataNode should now register itself with the following method:
+    The NodeManager should now register itself with the following method:
       * `register()`
 
 
@@ -67,5 +68,5 @@ This interface layer will set the following states, as appropriate:
 - [Apache Hadoop Juju Charm](http://jujucharms.com/?text=hadoop)
 
 
-[NameNode]: https://github.com/juju-solutions/layer-apache-hadoop-namenode/
-[DataNode]: https://github.com/juju-solutions/layer-apache-hadoop-datanode/
+[ResourceManager]: https://github.com/juju-solutions/layer-apache-hadoop-resourcemanager/
+[NodeManager]: https://github.com/juju-solutions/layer-apache-hadoop-nodemanager/
