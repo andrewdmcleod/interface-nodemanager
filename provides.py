@@ -24,7 +24,7 @@ class NodeManagerProvides(RelationBase):
     scope = scopes.GLOBAL
     auto_accessors = ['host', 'resourcemanager_port', 'hs_http', 'hs_ipc', 'ssh-key']
 
-    def set_spec(self, spec):
+    def set_nodemanager_spec(self, spec):
         """
         Set the local spec.
 
@@ -36,17 +36,24 @@ class NodeManagerProvides(RelationBase):
     def local_hostname(self):
         return hookenv.local_unit().replace('/', '-')
 
-    def spec(self):
-        return json.loads(self.get_remote('spec', '{}'))
+    def nodemanager_spec(self):
+        conv = self.conversation()
+        return json.loads(conv.get_local('spec', '{}'))
+
+    def resourcemanager_spec(self):
+        conv = self.conversation()
+        return json.loads(conv.get_remote('spec', '{}'))
 
     def hosts_map(self):
-        return json.loads(self.get_remote('hosts-map', '{}'))
+        conv = self.conversation()
+        return json.loads(conv.get_remote('hosts-map', '{}'))
 
-    @hook('{requires:nodemanager}-relation-joined')
+    @hook('{provides:nodemanager}-relation-joined')
     def joined(self):
-        self.set_state('{relation_name}.related')
+        conv = self.conversation()
+        conv.set_state('{relation_name}.related')
 
-    @hook('{requires:nodemanager}-relation-changed')
+    @hook('{provides:nodemanager}-relation-changed')
     def changed(self):
         hookenv.log('Data: {}'.format({
             'spec': self.spec(),
@@ -57,28 +64,31 @@ class NodeManagerProvides(RelationBase):
             'hosts_map': self.hosts_map(),
             'local_hostname': self.local_hostname(),
         }))
+        conv = self.conversation()
         available = all([self.spec(), self.host(), self.resourcemanager_port(), self.hs_http(), self.hs_ipc(), self.ssh_key()])
         spec_matches = self._spec_match()
         registered = self.local_hostname() in self.hosts_map().values()
 
-        self.toggle_state('{relation_name}.spec.mismatch', available and not spec_matches)
-        self.toggle_state('{relation_name}.ready', available and spec_matches and registered)
+        conv.toggle_state('{relation_name}.spec.mismatch', available and not spec_matches)
+        conv.toggle_state('{relation_name}.ready', available and spec_matches and registered)
 
         hookenv.log('States: {}'.format(get_states().keys()))
 
     def register(self):
-        self.set_remote('registered', 'true')
+        conv = self.conversation()
+        conv.set_remote('registered', 'true')
 
-    @hook('{requires:nodemanager}-relation-{departed,broken}')
+    @hook('{provides:nodemanager}-relation-{departed,broken}')
     def departed(self):
-        self.remove_state('{relation_name}.related')
-        self.remove_state('{relation_name}.spec.mismatch')
-        self.remove_state('{relation_name}.ready')
+        conv = self.conversation()
+        conv.remove_state('{relation_name}.related')
+        conv.remove_state('{relation_name}.spec.mismatch')
+        conv.remove_state('{relation_name}.ready')
 
     def _spec_match(self):
-        conv = self.conversation()
-        local_spec = json.loads(conv.get_local('spec', '{}'))
-        remote_spec = json.loads(conv.get_remote('spec', '{}'))
-        for key, value in local_spec.items():
-            if value != remote_spec.get(key):
+        datanode_spec = self.datanode_spec()
+        namenode_spec = self.namenode_spec()
+        for key, value in datanode_spec.items():
+            if value != namenode_spec.get(key):
                 return False
+        return True

@@ -22,24 +22,24 @@ from jujubigdata import utils
 class NodeManagerRequires(RelationBase):
     scope = scopes.UNIT
 
-    @hook('{provides:nodemanager}-relation-joined')
+    @hook('{requires:nodemanager}-relation-joined')
     def joined(self):
         conv = self.conversation()
         conv.set_state('{relation_name}.related')
 
-    @hook('{provides:nodemanager}-relation-changed')
+    @hook('{requires:nodemanager}-relation-changed')
     def changed(self):
         conv = self.conversation()
         registered = conv.get_remote('registered', 'false').lower() == 'true'
         conv.toggle_state('{relation_name}.registered', registered)
 
-    @hook('{provides:nodemanager}-relation-departed')
+    @hook('{requires:nodemanager}-relation-departed')
     def departed(self):
         conv = self.conversation()
         conv.add_state('{relation_name}.departing')
         conv.remove_state('{relation_name}.related')
 
-    @hook('{provides:nodemanager}-relation-broken')
+    @hook('{requires:nodemanager}-relation-broken')
     def broken(self):
         conv = self.conversation()
         conv.remove_state('{relation_name}.related')
@@ -49,7 +49,7 @@ class NodeManagerRequires(RelationBase):
         return [
             {
                 'host': conv.scope.replace('/', '-'),
-                'ip': utils.resolve_private_address(conv.get_remote('private-address')),
+                'ip': utils.resolve_private_address(conv.get_remote('private-address'), ''),
             }
             for conv in self.conversations()
         ]
