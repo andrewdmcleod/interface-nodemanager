@@ -27,7 +27,7 @@ This interface layer will set the following states, as appropriate:
       * `nodemanagers()`
 
   * `{relation_name}.departing` One or more NodeManagers are about to depart,
-    and the NameNode should remove them from the pool of slaves.
+    and the ResourceManager should remove them from the pool of slaves.
     Information about the departing NodeManagers can be gotten from the method:
       * `nodemanagers()`
 

@@ -56,7 +56,7 @@ class NodeManagerProvides(RelationBase):
     @hook('{provides:nodemanager}-relation-changed')
     def changed(self):
         hookenv.log('Data: {}'.format({
-            'spec': self.spec(),
+            'spec': self.nodemanager_spec(),
             'host': self.host(),
             'resourcemanager_port': self.resourcemanager_port(),
             'hs_http': self.hs_http(),
@@ -65,7 +65,9 @@ class NodeManagerProvides(RelationBase):
             'local_hostname': self.local_hostname(),
         }))
         conv = self.conversation()
-        available = all([self.spec(), self.host(), self.resourcemanager_port(), self.hs_http(), self.hs_ipc(), self.ssh_key()])
+        available = all([self.nodemanager_spec(), self.host(),
+                        self.resourcemanager_port(), self.hs_http(),
+                        self.hs_ipc(), self.ssh_key()])
         spec_matches = self._spec_match()
         registered = self.local_hostname() in self.hosts_map().values()
 
@@ -86,9 +88,9 @@ class NodeManagerProvides(RelationBase):
         conv.remove_state('{relation_name}.ready')
 
     def _spec_match(self):
-        datanode_spec = self.datanode_spec()
-        namenode_spec = self.namenode_spec()
-        for key, value in datanode_spec.items():
-            if value != namenode_spec.get(key):
+        nodemanager_spec = self.nodemanager_spec()
+        resourcemanager_spec = self.resourcemanager_spec()
+        for key, value in nodemanager_spec.items():
+            if value != resourcemanager_spec.get(key):
                 return False
         return True

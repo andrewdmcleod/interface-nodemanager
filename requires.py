@@ -36,14 +36,16 @@ class NodeManagerRequires(RelationBase):
     @hook('{requires:nodemanager}-relation-departed')
     def departed(self):
         conv = self.conversation()
-        conv.add_state('{relation_name}.departing')
+        conv.set_state('{relation_name}.departing')
         conv.remove_state('{relation_name}.related')
+        conv.remove_state('{relation_name}.registered')
 
     @hook('{requires:nodemanager}-relation-broken')
     def broken(self):
         conv = self.conversation()
         conv.remove_state('{relation_name}.related')
         conv.remove_state('{relation_name}.departing')
+        conv.remove_state('{relation_name}.registered')
 
     def nodes(self):
         return [
