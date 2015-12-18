@@ -64,10 +64,10 @@ class NodeManagerRequires(RelationBase):
         for conv in self.conversations():
             conv.set_remote('host', host)
 
-    def send_ports(self, resourcemanager_port, hs_http, hs_ipc):
+    def send_ports(self, port, hs_http, hs_ipc):
         for conv in self.conversations():
             conv.set_remote(data={
-                'resourcemanager_port': resourcemanager_port,
+                'port': port,
                 'hs_http': hs_http,
                 'hs_ipc': hs_ipc,
             })

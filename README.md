@@ -18,7 +18,7 @@ This interface layer will set the following states, as appropriate:
     information to the NodeManagers:
       * `send_spec(spec)`
       * `send_host(host)`
-      * `send_ports(port, resourcemanager_port, hs_http, hs_ipc)`
+      * `send_ports(port, port, hs_http, hs_ipc)`
       * `send_ssh_key(ssh_key)`
       * `send_hosts_map(hosts_map)`
 
@@ -45,7 +45,7 @@ This interface layer will set the following states, as appropriate:
     The provided information can be accessed via the following methods:
       * `spec()`
       * `host()`
-      * `resourcemanager_port()`
+      * `port()`
       * `hs_http()`
       * `hs_ipc()`
       * `ssh_key()`
