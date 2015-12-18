@@ -69,10 +69,10 @@ class NodeManagerProvides(RelationBase):
                         self.resourcemanager_port(), self.hs_http(),
                         self.hs_ipc(), self.ssh_key()])
         spec_matches = self._spec_match()
-        registered = self.local_hostname() in self.hosts_map().values()
+        visible = self.local_hostname() in self.hosts_map().values()
 
         conv.toggle_state('{relation_name}.spec.mismatch', available and not spec_matches)
-        conv.toggle_state('{relation_name}.ready', available and spec_matches and registered)
+        conv.toggle_state('{relation_name}.ready', available and spec_matches and visible)
 
         hookenv.log('States: {}'.format(get_states().keys()))
 
