@@ -44,7 +44,7 @@ class NodeManagerRequires(RelationBase):
 
     def dismiss(self):
         for conv in self.conversations():
-            conv.remove_state('{relation_name}.registered')
+            conv.remove_state('{relation_name}.departing')
 
     def nodes(self):
         return [
