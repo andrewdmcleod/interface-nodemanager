@@ -24,7 +24,7 @@ class NodeManagerProvides(RelationBase):
     scope = scopes.GLOBAL
     auto_accessors = ['host', 'port', 'hs_http', 'hs_ipc', 'ssh-key']
 
-    def set_nodemanager_spec(self, spec):
+    def set_local_spec(self, spec):
         """
         Set the local spec.
 
@@ -36,11 +36,11 @@ class NodeManagerProvides(RelationBase):
     def local_hostname(self):
         return hookenv.local_unit().replace('/', '-')
 
-    def nodemanager_spec(self):
+    def local_spec(self):
         conv = self.conversation()
         return json.loads(conv.get_local('spec', '{}'))
 
-    def resourcemanager_spec(self):
+    def remote_spec(self):
         conv = self.conversation()
         return json.loads(conv.get_remote('spec', '{}'))
 
@@ -56,7 +56,8 @@ class NodeManagerProvides(RelationBase):
     @hook('{provides:nodemanager}-relation-changed')
     def changed(self):
         hookenv.log('Data: {}'.format({
-            'spec': self.nodemanager_spec(),
+            'local_spec': self.local_spec(),
+            'remote_spec': self.remote_spec(),
             'host': self.host(),
             'port': self.port(),
             'hs_http': self.hs_http(),
@@ -65,9 +66,13 @@ class NodeManagerProvides(RelationBase):
             'local_hostname': self.local_hostname(),
         }))
         conv = self.conversation()
-        available = all([self.nodemanager_spec(), self.host(),
-                        self.port(), self.hs_http(),
-                        self.hs_ipc(), self.ssh_key()])
+        available = all([
+            self.remote_spec() is not None,
+            self.host(),
+            self.port(),
+            self.hs_http(),
+            self.hs_ipc(),
+            self.ssh_key()])
         spec_matches = self._spec_match()
         visible = self.local_hostname() in self.hosts_map().values()
 
@@ -88,8 +93,10 @@ class NodeManagerProvides(RelationBase):
         conv.remove_state('{relation_name}.ready')
 
     def _spec_match(self):
-        nodemanager_spec = self.nodemanager_spec()
-        resourcemanager_spec = self.resourcemanager_spec()
+        nodemanager_spec = self.local_spec()
+        resourcemanager_spec = self.remote_spec()
+        if None in (nodemanager_spec, resourcemanager_spec):
+            return False
         for key, value in nodemanager_spec.items():
             if value != resourcemanager_spec.get(key):
                 return False
