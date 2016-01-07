@@ -22,7 +22,7 @@ from charmhelpers.core import hookenv
 
 class NodeManagerProvides(RelationBase):
     scope = scopes.GLOBAL
-    auto_accessors = ['host', 'port', 'hs_http', 'hs_ipc', 'ssh-key']
+    auto_accessors = ['port', 'hs_http', 'hs_ipc', 'ssh-key']
 
     def set_local_spec(self, spec):
         """
@@ -44,6 +44,10 @@ class NodeManagerProvides(RelationBase):
         conv = self.conversation()
         return json.loads(conv.get_remote('spec', '{}'))
 
+    def resourcemanagers(self):
+        conv = self.conversation()
+        return json.loads(conv.get_remote('resourcemanagers', '[]'))
+
     def hosts_map(self):
         conv = self.conversation()
         return json.loads(conv.get_remote('hosts-map', '{}'))
@@ -58,7 +62,7 @@ class NodeManagerProvides(RelationBase):
         hookenv.log('Data: {}'.format({
             'local_spec': self.local_spec(),
             'remote_spec': self.remote_spec(),
-            'host': self.host(),
+            'resourcemanagers': self.resourcemanagers(),
             'port': self.port(),
             'hs_http': self.hs_http(),
             'hs_ipc': self.hs_ipc(),
@@ -68,7 +72,8 @@ class NodeManagerProvides(RelationBase):
         conv = self.conversation()
         available = all([
             self.remote_spec() is not None,
-            self.host(),
+            self.hosts_map(),
+            self.resourcemanagers(),
             self.port(),
             self.hs_http(),
             self.hs_ipc(),
@@ -85,7 +90,7 @@ class NodeManagerProvides(RelationBase):
         conv = self.conversation()
         conv.set_remote('registered', 'true')
 
-    @hook('{provides:nodemanager}-relation-{departed,broken}')
+    @hook('{provides:nodemanager}-relation-departed')
     def departed(self):
         conv = self.conversation()
         conv.remove_state('{relation_name}.related')
