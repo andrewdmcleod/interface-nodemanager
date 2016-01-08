@@ -59,9 +59,9 @@ class NodeManagerRequires(RelationBase):
         for conv in self.conversations():
             conv.set_remote('spec', json.dumps(spec))
 
-    def send_host(self, host):
+    def send_resourcemanagers(self, resourcemanagers):
         for conv in self.conversations():
-            conv.set_remote('host', host)
+            conv.set_remote('resourcemanagers', json.dumps(resourcemanagers))
 
     def send_ports(self, port, hs_http, hs_ipc):
         for conv in self.conversations():
