@@ -1,4 +1,4 @@
-name: nodemanager
-summary: Interface for relating NodeManagers to ResourceManagers 
+name: mapred-slave
+summary: Interface for relating NodeManagers to ResourceManagers
 version: 1
 maintainer: "Big Data Team <bigdata@lists.ubuntu.com>"
