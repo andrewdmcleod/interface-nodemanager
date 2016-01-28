@@ -22,25 +22,17 @@ from jujubigdata import utils
 class NodeManagerRequires(RelationBase):
     scope = scopes.UNIT
 
-    @hook('{requires:nodemanager}-relation-joined')
+    @hook('{requires:mapred-slave}-relation-joined')
     def joined(self):
         conv = self.conversation()
         conv.set_state('{relation_name}.related')
-        conv.remove_state('{relation_name}.registered')
         conv.remove_state('{relation_name}.departing')
 
-    @hook('{requires:nodemanager}-relation-changed')
-    def changed(self):
-        conv = self.conversation()
-        registered = conv.get_remote('registered', 'false').lower() == 'true'
-        conv.toggle_state('{relation_name}.registered', registered)
-
-    @hook('{requires:nodemanager}-relation-departed')
+    @hook('{requires:mapred-slave}-relation-departed')
     def departed(self):
         conv = self.conversation()
-        conv.set_state('{relation_name}.departing')
         conv.remove_state('{relation_name}.related')
-        conv.remove_state('{relation_name}.registered')
+        conv.set_state('{relation_name}.departing')
 
     def dismiss(self):
         for conv in self.conversations():
@@ -67,8 +59,8 @@ class NodeManagerRequires(RelationBase):
         for conv in self.conversations():
             conv.set_remote(data={
                 'port': port,
-                'hs_http': hs_http,
-                'hs_ipc': hs_ipc,
+                'historyserver_http': hs_http,
+                'historyserver_ipc': hs_ipc,
             })
 
     def send_ssh_key(self, ssh_key):
@@ -77,4 +69,4 @@ class NodeManagerRequires(RelationBase):
 
     def send_hosts_map(self, hosts_map):
         for conv in self.conversations():
-            conv.set_remote('hosts-map', json.dumps(hosts_map))
+            conv.set_remote('etc_hosts', json.dumps(hosts_map))

@@ -22,7 +22,7 @@ from charmhelpers.core import hookenv
 
 class NodeManagerProvides(RelationBase):
     scope = scopes.GLOBAL
-    auto_accessors = ['port', 'hs_http', 'hs_ipc', 'ssh-key']
+    auto_accessors = ['port', 'historyserver_http', 'historyserver_ipc', 'ssh-key']
 
     def set_local_spec(self, spec):
         """
@@ -51,6 +51,12 @@ class NodeManagerProvides(RelationBase):
     def hosts_map(self):
         conv = self.conversation()
         return json.loads(conv.get_remote('hosts-map', '{}'))
+
+    def hs_http(self):
+        return self.historyserver_http()
+
+    def hs_ipc(self):
+        return self.historyserver_ipc()
 
     @hook('{provides:nodemanager}-relation-joined')
     def joined(self):
@@ -85,10 +91,6 @@ class NodeManagerProvides(RelationBase):
         conv.toggle_state('{relation_name}.ready', available and spec_matches and visible)
 
         hookenv.log('States: {}'.format(get_states().keys()))
-
-    def register(self):
-        conv = self.conversation()
-        conv.set_remote('registered', 'true')
 
     @hook('{provides:nodemanager}-relation-departed')
     def departed(self):
