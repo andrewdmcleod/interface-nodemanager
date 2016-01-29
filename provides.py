@@ -50,7 +50,7 @@ class NodeManagerProvides(RelationBase):
 
     def hosts_map(self):
         conv = self.conversation()
-        return json.loads(conv.get_remote('hosts-map', '{}'))
+        return json.loads(conv.get_remote('etc_hosts', '{}'))
 
     def hs_http(self):
         return self.historyserver_http()
@@ -58,12 +58,12 @@ class NodeManagerProvides(RelationBase):
     def hs_ipc(self):
         return self.historyserver_ipc()
 
-    @hook('{provides:nodemanager}-relation-joined')
+    @hook('{provides:mapred-slave}-relation-joined')
     def joined(self):
         conv = self.conversation()
         conv.set_state('{relation_name}.related')
 
-    @hook('{provides:nodemanager}-relation-changed')
+    @hook('{provides:mapred-slave}-relation-changed')
     def changed(self):
         hookenv.log('Data: {}'.format({
             'local_spec': self.local_spec(),
@@ -92,7 +92,7 @@ class NodeManagerProvides(RelationBase):
 
         hookenv.log('States: {}'.format(get_states().keys()))
 
-    @hook('{provides:nodemanager}-relation-departed')
+    @hook('{provides:mapred-slave}-relation-departed')
     def departed(self):
         conv = self.conversation()
         conv.remove_state('{relation_name}.related')
