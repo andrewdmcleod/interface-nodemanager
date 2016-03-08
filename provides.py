@@ -22,7 +22,12 @@ from charmhelpers.core import hookenv
 
 class NodeManagerProvides(RelationBase):
     scope = scopes.GLOBAL
-    auto_accessors = ['port', 'historyserver_http', 'historyserver_ipc', 'ssh-key']
+    auto_accessors = [
+        'port',
+        'historyserver_http',
+        'historyserver_ipc',
+        'ssh-key',
+    ]
 
     def set_local_spec(self, spec):
         """
@@ -84,11 +89,12 @@ class NodeManagerProvides(RelationBase):
             self.hs_http(),
             self.hs_ipc(),
             self.ssh_key()])
-        spec_matches = self._spec_match()
+        spec_mismatch = available and not self._spec_match()
         visible = self.local_hostname() in self.hosts_map().values()
+        ready = available and visible
 
-        conv.toggle_state('{relation_name}.spec.mismatch', available and not spec_matches)
-        conv.toggle_state('{relation_name}.ready', available and spec_matches and visible)
+        conv.toggle_state('{relation_name}.spec.mismatch', spec_mismatch)
+        conv.toggle_state('{relation_name}.ready', ready and not spec_mismatch)
 
         hookenv.log('States: {}'.format(get_states().keys()))
 
