@@ -13,7 +13,7 @@ units.
 
 This interface layer will set the following states, as appropriate:
 
-  * `{relation_name}.related` One or more NodeManagers have connected.  The
+  * `{relation_name}.joined` One or more NodeManagers have connected.  The
     charm should call the following methods to provide the appropriate
     information to the NodeManagers:
       * `send_spec(spec)`
@@ -21,10 +21,6 @@ This interface layer will set the following states, as appropriate:
       * `send_ports(port, port, hs_http, hs_ipc)`
       * `send_ssh_key(ssh_key)`
       * `send_hosts_map(hosts_map)`
-
-  * `{relation_name}.registered` One or more NodeManagers are ready to use.
-    Information about the registered NodeManagers can be gotten from the method:
-      * `nodemanagers()`
 
   * `{relation_name}.departing` One or more NodeManagers are about to depart,
     and the ResourceManager should remove them from the pool of slaves.
@@ -36,7 +32,7 @@ This interface layer will set the following states, as appropriate:
 
 This interface layer will set the following states, as appropriate:
 
-  * `{relation_name}.related` The relation is established, but YARN may not yet
+  * `{relation_name}.joined` The relation is established, but YARN may not yet
     have provided any connection or service information.
 
   * `{relation_name}.ready` The ResourceManager has provided all of the necessary
@@ -50,9 +46,6 @@ This interface layer will set the following states, as appropriate:
       * `hs_ipc()`
       * `ssh_key()`
       * `hosts_map()`
-
-    The NodeManager should now register itself with the following method:
-      * `register()`
 
 
 # Contact Information
