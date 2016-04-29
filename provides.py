@@ -54,6 +54,13 @@ class NodeManagerProvides(RelationBase):
         return json.loads(conv.get_remote('resourcemanagers', '[]'))
 
     def hosts_map(self):
+        """
+        Return a mapping of IPs to host names suitable for use with
+        `jujubigdata.utils.update_etc_hosts`.
+
+        This will contain info for the ResourceManager as well as all
+        NodeManagers to ensure that they are resolvable.
+        """
         conv = self.conversation()
         return json.loads(conv.get_remote('etc_hosts', '{}'))
 

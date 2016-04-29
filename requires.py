@@ -39,14 +39,16 @@ class NodeManagerRequires(RelationBase):
             conv.remove_state('{relation_name}.departing')
 
     def nodes(self):
-        return [
-            {
-                'host': conv.scope.replace('/', '-'),
-                'ip': utils.resolve_private_address(
-                    conv.get_remote('private-address', '')),
-            }
-            for conv in self.conversations()
-        ]
+        return [conv.scope.replace('/', '-') for conv in self.conversations()]
+
+    def hosts_map(self):
+        result = {}
+        for conv in self.conversations():
+            host = conv.scope.replace('/', '-')
+            addr = conv.get_remote('private-address', '')
+            ip = utils.resolve_private_address(addr)
+            result.update({ip: host})
+        return result
 
     def send_spec(self, spec):
         for conv in self.conversations():
